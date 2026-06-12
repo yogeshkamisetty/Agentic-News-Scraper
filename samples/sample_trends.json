@@ -1,0 +1,32 @@
+[
+  {
+    "theme_id": "001_agent_working_memory",
+    "theme_title": "Agent Working Memory",
+    "articles": [
+      {
+        "Title": "Anthropic Unveils Claude 4.0: A Leap in Agentic Capabilities",
+        "Score": 125
+      },
+      {
+        "Title": "Why Context Caching is the New Vector DB",
+        "Score": 85
+      }
+    ],
+    "cumulative_score": 210,
+    "primary_category": "Product Launch",
+    "companies": ["Anthropic"]
+  },
+  {
+    "theme_id": "002_enterprise_governance",
+    "theme_title": "Enterprise Governance",
+    "articles": [
+      {
+        "Title": "OpenAI Announces Enterprise Agent Governance Framework",
+        "Score": 110
+      }
+    ],
+    "cumulative_score": 110,
+    "primary_category": "Enterprise Security",
+    "companies": ["OpenAI"]
+  }
+]

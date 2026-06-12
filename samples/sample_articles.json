@@ -1,0 +1,30 @@
+[
+  {
+    "Title": "Anthropic Unveils Claude 4.0: A Leap in Agentic Capabilities",
+    "Source": "HackerNews",
+    "Published Date": "2026-06-12T08:00:00Z",
+    "URL": "https://news.ycombinator.com/item?id=12345678",
+    "Summary": "Anthropic has just released Claude 4.0, emphasizing major improvements to working memory and multi-step reasoning capabilities. The model introduces a new context-caching mechanism designed specifically for continuous autonomous agents. Discussion: 450 score, 210 comments.",
+    "Category": "Product Launch",
+    "Company Mentioned": "Anthropic",
+    "Keywords": "claude, agents, working memory, autonomous",
+    "Importance Score": 125,
+    "Why It Matters": "This represents a fundamental shift in how foundation models support long-running agent workflows natively, reducing the need for complex external orchestration.",
+    "SaaS Impact": "AI wrappers building orchestration layers might see their value proposition threatened as native models absorb these capabilities.",
+    "PM Perspective": "Product teams need to re-evaluate their RAG pipelines. If context caching makes long-context cheaper, simpler architectures may outperform complex vector databases."
+  },
+  {
+    "Title": "OpenAI Announces Enterprise Agent Governance Framework",
+    "Source": "Product Hunt AI",
+    "Published Date": "2026-06-11T14:30:00Z",
+    "URL": "https://producthunt.com/posts/openai-agent-gov",
+    "Summary": "A new suite of tools from OpenAI aimed at giving IT admins strict control over what internal data autonomous agents can access. | Product Hunt launch | Votes: 850 | Comments: 120",
+    "Category": "Enterprise Security",
+    "Company Mentioned": "OpenAI",
+    "Keywords": "governance, enterprise, security, agents",
+    "Importance Score": 110,
+    "Why It Matters": "Security has been the biggest blocker for enterprise agent adoption. Official frameworks from tier-1 labs signal enterprise readiness.",
+    "SaaS Impact": "B2B SaaS companies must integrate with these new governance APIs to remain compliant in enterprise environments.",
+    "PM Perspective": "When designing agentic features, prioritize 'auditability' and 'permissions mapping' as tier-1 features, not just afterthoughts."
+  }
+]
