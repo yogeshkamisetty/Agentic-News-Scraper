@@ -1,0 +1,103 @@
+[
+  {
+    "name": "TechCrunch",
+    "method": "rss",
+    "url": "https://techcrunch.com/feed/"
+  },
+  {
+    "name": "VentureBeat",
+    "method": "rss",
+    "url": "https://venturebeat.com/feed/"
+  },
+  {
+    "name": "MIT Technology Review",
+    "method": "rss",
+    "url": "https://www.technologyreview.com/feed/"
+  },
+  {
+    "name": "The Verge",
+    "method": "rss",
+    "url": "https://www.theverge.com/rss/index.xml"
+  },
+  {
+    "name": "Wired",
+    "method": "rss",
+    "url": "https://www.wired.com/feed/rss"
+  },
+  {
+    "name": "Ars Technica",
+    "method": "rss",
+    "url": "http://feeds.arstechnica.com/arstechnica/index"
+  },
+  {
+    "name": "Import AI",
+    "method": "rss",
+    "url": "https://importai.substack.com/feed"
+  },
+  {
+    "name": "The Batch",
+    "method": "rss",
+    "url": "https://www.deeplearning.ai/the-batch/feed/"
+  },
+  {
+    "name": "Ahead of AI",
+    "method": "rss",
+    "url": "https://magazine.sebastianraschka.com/feed"
+  },
+  {
+    "name": "AI Breakfast",
+    "method": "rss",
+    "url": "https://aibreakfast.beehiiv.com/feed"
+  },
+  {
+    "name": "Ben's Bites",
+    "method": "rss",
+    "url": "https://www.bensbites.com/feed"
+  },
+  {
+    "name": "Latent Space",
+    "method": "rss",
+    "url": "https://www.latent.space/feed"
+  },
+  {
+    "name": "a16z",
+    "method": "rss",
+    "url": "https://a16z.com/feed/"
+  },
+  {
+    "name": "Y Combinator",
+    "method": "rss",
+    "url": "https://www.ycombinator.com/blog/feed"
+  },
+  {
+    "name": "Sequoia Capital",
+    "method": "rss",
+    "url": "https://www.sequoiacap.com/feed/"
+  },
+
+  {
+    "name": "Hacker News",
+    "method": "hackernews"
+  },
+
+  {
+    "name": "r/MachineLearning",
+    "method": "reddit",
+    "subreddit": "MachineLearning"
+  },
+  {
+    "name": "r/LocalLLaMA",
+    "method": "reddit",
+    "subreddit": "LocalLLaMA"
+  },
+  {
+    "name": "r/singularity",
+    "method": "reddit",
+    "subreddit": "singularity"
+  },
+
+  {
+    "name": "Product Hunt AI",
+    "method": "producthunt"
+  }
+]

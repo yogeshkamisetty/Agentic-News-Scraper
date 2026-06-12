@@ -1,0 +1,7 @@
+feedparser
+pandas
+openpyxl
+requests
+beautifulsoup4
+rapidfuzz
+reportlab

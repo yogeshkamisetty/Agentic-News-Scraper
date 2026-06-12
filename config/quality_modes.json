@@ -1,0 +1,104 @@
+{
+  "strict": {
+    "description": "Premium intelligence only. High confidence, minimal noise, strong signal density.",
+    "score_floor": 40,
+    "source_scale": 1.0,
+    "category_multipliers": {
+      "Agentic AI": 1.2,
+      "RAG / Infrastructure": 1.15,
+      "Developer AI": 1.05,
+      "Enterprise AI": 1.1,
+      "AI Update": 0.85
+    },
+    "source_thresholds": {
+      "tier1": 35,
+      "newsletters": 40,
+      "reddit": 45,
+      "hackernews": 40,
+      "default": 40
+    },
+    "refine_min_score": 45,
+    "content_top_n": {
+      "trend": 8,
+      "carousel": 6,
+      "linkedin": 6,
+      "whitepaper": 12,
+      "default": 5
+    },
+    "category_caps": {
+      "Agentic AI": 2,
+      "RAG / Infrastructure": 2,
+      "Developer AI": 2,
+      "Enterprise AI": 2,
+      "AI Update": 1
+    }
+  },
+  "balanced": {
+    "description": "Best tradeoff between quality and diversity.",
+    "score_floor": 30,
+    "source_scale": 1.0,
+    "category_multipliers": {
+      "Agentic AI": 1.1,
+      "RAG / Infrastructure": 1.15,
+      "Developer AI": 1.05,
+      "Enterprise AI": 1.1,
+      "AI Update": 1.0
+    },
+    "source_thresholds": {
+      "tier1": 25,
+      "newsletters": 30,
+      "reddit": 30,
+      "hackernews": 25,
+      "default": 30
+    },
+    "refine_min_score": 35,
+    "content_top_n": {
+      "trend": 10,
+      "carousel": 8,
+      "linkedin": 8,
+      "whitepaper": 15,
+      "default": 5
+    },
+    "category_caps": {
+      "Agentic AI": 3,
+      "RAG / Infrastructure": 3,
+      "Developer AI": 2,
+      "Enterprise AI": 2,
+      "AI Update": 2
+    }
+  },
+  "broad": {
+    "description": "Higher recall and exploratory signals for trend detection.",
+    "score_floor": 20,
+    "source_scale": 0.95,
+    "category_multipliers": {
+      "Agentic AI": 1.05,
+      "RAG / Infrastructure": 1.1,
+      "Developer AI": 1.0,
+      "Enterprise AI": 1.05,
+      "AI Update": 0.95
+    },
+    "source_thresholds": {
+      "tier1": 20,
+      "newsletters": 25,
+      "reddit": 25,
+      "hackernews": 20,
+      "default": 25
+    },
+    "refine_min_score": 25,
+    "content_top_n": {
+      "trend": 15,
+      "carousel": 12,
+      "linkedin": 12,
+      "whitepaper": 20,
+      "default": 8
+    },
+    "category_caps": {
+      "Agentic AI": 4,
+      "RAG / Infrastructure": 4,
+      "Developer AI": 3,
+      "Enterprise AI": 3,
+      "AI Update": 3
+    }
+  }
+}
