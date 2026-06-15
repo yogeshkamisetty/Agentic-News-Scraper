@@ -32,9 +32,7 @@ from utils.excel_writer import (
     save_to_excel
 )
 
-from utils.linkedin_generator import (
-    generate_linkedin_posts
-)
+
 
 from utils.scorer import (
     calculate_score
@@ -534,11 +532,7 @@ def main():
         )
     )
 
-    linkedin_file = (
-        generate_linkedin_posts(
-            filtered_articles
-        )
-    )
+
 
     total_elapsed = round(
         time.time()
@@ -595,11 +589,7 @@ def main():
             "\nNo articles passed the quality filter - Excel not saved."
         )
 
-    if linkedin_file:
-        print(
-            "\nLinkedIn posts generated:"
-        )
-        print(linkedin_file)
+
 
     print(
         f"\nCompleted in "

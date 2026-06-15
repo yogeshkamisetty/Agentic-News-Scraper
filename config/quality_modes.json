@@ -20,9 +20,6 @@
     "refine_min_score": 45,
     "content_top_n": {
       "trend": 8,
-      "carousel": 6,
-      "linkedin": 6,
-      "whitepaper": 12,
       "default": 5
     },
     "category_caps": {
@@ -54,9 +51,6 @@
     "refine_min_score": 35,
     "content_top_n": {
       "trend": 10,
-      "carousel": 8,
-      "linkedin": 8,
-      "whitepaper": 15,
       "default": 5
     },
     "category_caps": {
@@ -88,9 +82,6 @@
     "refine_min_score": 25,
     "content_top_n": {
       "trend": 15,
-      "carousel": 12,
-      "linkedin": 12,
-      "whitepaper": 20,
       "default": 8
     },
     "category_caps": {

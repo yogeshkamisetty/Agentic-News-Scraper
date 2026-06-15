@@ -55,9 +55,6 @@ def load_quality_modes():
                 "refine_min_score": 35,
                 "content_top_n": {
                     "trend": 10,
-                    "carousel": 8,
-                    "linkedin": 8,
-                    "whitepaper": 15,
                     "default": 5,
                 },
                 "category_caps": {

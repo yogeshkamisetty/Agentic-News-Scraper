@@ -42,7 +42,7 @@ from utils.quality_mode import (
     get_quality_mode,
     get_refine_min_score,
 )
-from utils.theme_clustering import cluster_themes
+
 
 
 OUTPUT_FOLDER = "outputs"
@@ -184,19 +184,7 @@ def refine_dataframe(df: pd.DataFrame, mode=None) -> pd.DataFrame:
     refined_df = pd.DataFrame(refined_rows)
     refined_df = refined_df.sort_values(by="Importance Score", ascending=False).reset_index(drop=True)
 
-    clustered_df, theme_summary, theme_stats = cluster_themes(
-        refined_df,
-        mode=mode,
-        return_clusters=True,
-    )
-
-    print(f"Refinement dedupe stats: {stats}")
-    print(f"Theme cluster stats: {theme_stats}")
-
-    clustered_df.attrs["theme_summary"] = theme_summary
-    clustered_df.attrs["theme_stats"] = theme_stats
-
-    return clustered_df
+    return refined_df
 
 
 def save_refined_file(df: pd.DataFrame) -> str:
@@ -210,12 +198,7 @@ def save_refined_file(df: pd.DataFrame) -> str:
     timestamped_path = os.path.join(OUTPUT_FOLDER, f"refined_agentic_updates_{timestamp}.xlsx")
     df.to_excel(timestamped_path, index=False)
 
-    theme_summary = df.attrs.get("theme_summary", [])
-    if theme_summary:
-        theme_path = os.path.join(OUTPUT_FOLDER, f"theme_clusters_{timestamp}.json")
-        with open(theme_path, "w", encoding="utf-8") as file:
-            json.dump(theme_summary, file, indent=2, ensure_ascii=False)
-        print(f"Saved theme cluster summary: {theme_path}")
+
 
     return timestamped_path
 

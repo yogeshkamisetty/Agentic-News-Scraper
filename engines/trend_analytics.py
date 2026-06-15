@@ -18,7 +18,7 @@ from utils.quality_mode import (
     get_content_top_n,
     get_quality_mode,
 )
-from utils.theme_clustering import select_theme_representatives
+
 
 
 OUTPUT_FOLDER = "outputs"
@@ -185,14 +185,7 @@ def get_top_keywords(df):
 
 def get_top_updates(df):
 
-    df = select_theme_representatives(
-        df,
-        top_n=get_content_top_n(
-            QUALITY_MODE,
-            "trend"
-        ),
-        mode=QUALITY_MODE
-    )
+
 
     return (
         df.sort_values(
@@ -239,22 +232,7 @@ def build_report(df):
         )
     )
 
-    themes = []
-    if "Theme Name" in df.columns and "Theme Score" in df.columns:
-        theme_df = df[df["Theme Representative"] == True].copy() if "Theme Representative" in df.columns else df.copy()
-        if not theme_df.empty:
-            theme_group = (
-                theme_df.groupby(["Theme ID", "Theme Name"], dropna=False)
-                .agg({
-                    "Theme Score": "max",
-                    "Title": "first",
-                    "Importance Score": "max",
-                    "Theme Cluster Size": "max",
-                })
-                .reset_index()
-                .sort_values(by=["Theme Score", "Importance Score"], ascending=False)
-            )
-            themes = theme_group.head(10).to_dict(orient="records")
+
 
     top_updates = (
         get_top_updates(
@@ -345,16 +323,7 @@ def build_report(df):
             f"({count})"
         )
 
-    if themes:
-        report.append(
-            "\n## Top Themes\n"
-        )
 
-        for index, theme in enumerate(themes, start=1):
-            report.append(
-                f"{index}. {theme['Theme Name']} — {theme['Theme Cluster Size']} articles "
-                f"(Theme Score: {theme['Theme Score']}, Representative: {theme['Title']})"
-            )
 
     report.append(
         "\n## Highest Signal Updates\n"
