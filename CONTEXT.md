@@ -2,6 +2,22 @@
 
 **Current snapshot:** June 15, 2026
 
+## June 15, 2026 (Part 4) — Architecture Pruning & Performance Deep Dive
+
+### What We Did
+- **Feature Pruning:** Completely removed the peripheral content generation engines (Whitepapers, LinkedIn Carousels, Theme Clustering, LinkedIn text generators). The repository is now strictly an intelligence aggregation and refinement engine.
+- **Deep Dive Fixes:** 
+  - **Reddit Concurrency:** Added a randomized `time.sleep(random.uniform(0.5, 3.0))` to `reddit_collector.py`. The parallel thread pool was firing all requests simultaneously, triggering Reddit's 429 DDoS protections. This jitter stagger fixed the issue completely.
+  - **Duplicate Code Removed:** Cleaned up a duplicated `clean_summary()` block in the Reddit collector.
+  - **Hacker News Expansion:** The `collect_hackernews()` limit in `main.py` was artificially low (20). It was bumped to 100, which expanded raw HN collection to 60+ updates per run, finding vastly more AI-specific content.
+
+### Result (Deep Dive Run)
+- Raw collected updates surged from 287 to **339**.
+- Runtime improved to ~38s.
+- All 3 configured subreddits successfully returned 10 updates each without any 429 failures.
+
+---
+
 ## June 15, 2026 (Part 3) — Project Cleanup & Reddit Rate Limit Fix
 
 ### What We Did
@@ -463,19 +479,10 @@ agentic-news-engine/
 ├── README.txt                       # Basic setup instructions
 ├── requirements.txt                 # Python dependencies
 ├── CONTEXT.md                       # This file - Project documentation
-├── engines/                         # Trend analysis and content repurposing tools
-│   ├── carousel_generator.py        # Builds carousel JSON from master data
-│   ├── carousel_pdf_generator.py    # ⚠️ Per-article 6-slide prototype (see note)
-│   ├── linkedin_carousel_bw.py      # B&W editorial carousel (10 slides, 600×600)
-│   ├── linkedin_carousel_canva.py   # Gray-minimal Canva-style carousel (9 slides, 4:5)
+├── engines/                         # Trend analysis and dataset merging
 │   ├── historical_filter_engine.py  # Builds master datasets from historical runs
-│   ├── master_linkedin_generator.py # Generates LinkedIn content from master data
-│   ├── refinement_engine.py         # Builds refined datasets and theme summaries
-│   ├── trend_analytics.py           # Creates trend report markdown
-│   └── whitepaper_generator.py      # Generates theme-level consulting whitepaper PDFs
-│
-├── generators/                      # Document rendering layer
-│   └── carousel_pdf_generator.py    # Theme-level LinkedIn carousel PDFs (canonical)
+│   ├── refinement_engine.py         # Builds refined datasets
+│   └── trend_analytics.py           # Creates trend report markdown
 │
 ├── collectors/                      # Article collection modules
 │   ├── __init__.py
@@ -495,14 +502,10 @@ agentic-news-engine/
 │   ├── deduplicator.py             # Duplicate removal
 │   ├── excel_writer.py             # Excel export formatting
 │   ├── insight_generator.py        # Insight generation (3 perspectives)
-│   ├── linkedin_generator.py       # LinkedIn post generation
-│   ├── pdf_theme.py                # Shared PDF palette and layout tokens
 │   ├── scorer.py                   # Importance scoring engine
 │   ├── quality_mode.py             # Quality mode profiles and thresholds
 │   ├── source_ranker.py            # Source credibility weighting
-│   ├── text_layout.py              # PDF text fit / bullet / chip helpers
-│   ├── theme_clustering.py         # Theme clustering and representative selection
-│   ├── top_updates.py              # Top stories ranking
+│   └── top_updates.py              # Top stories ranking
 │   └── __pycache__/
 │
 └── outputs/                         # Generated output directory
@@ -510,15 +513,7 @@ agentic-news-engine/
     ├── refined_agentic_updates.xlsx # Canonical refined dataset (overwritten each run)
     ├── master_agentic_updates_*.xlsx
     ├── refined_agentic_updates_*.xlsx
-    ├── theme_clusters_*.json
-    ├── master_linkedin_posts_*.md
-    ├── linkedin_posts_*.md
     ├── trend_report_*.md
-    ├── carousel_data_*.json
-    ├── carousels/                  # Theme-level LinkedIn carousel PDFs
-    ├── carousel_bw/                # B&W editorial carousel PDFs
-    ├── carousel_canva/             # Gray-minimal Canva-style carousel PDFs
-    ├── whitepapers/               # Theme-level consulting whitepaper PDFs
     └── other timestamped artifacts
 ```
 

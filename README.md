@@ -1,6 +1,6 @@
 # 🧠 Agentic News Engine
 
-An automated AI market-intelligence pipeline that **collects, filters, scores, deduplicates, clusters, and repackages** high-signal AI news into decision-ready outputs — Excel datasets, LinkedIn posts, carousel PDFs, and consulting-style whitepapers.
+An automated AI market-intelligence pipeline that **collects, filters, scores, deduplicates, and repackages** high-signal AI news into decision-ready outputs — Excel datasets and trend reports.
 
 > Turn the noisy daily flow of AI news into ranked, executive-grade intelligence — automatically.
 
@@ -8,16 +8,16 @@ An automated AI market-intelligence pipeline that **collects, filters, scores, d
 
 ## ✨ What It Does
 
-```
+```text
 30 sources  →  collect  →  dedupe  →  score & filter  →  enrich  →  rank  →  outputs
                                                                             │
-              ┌─────────────────────────────────────────────────────────────┤
-              ▼              ▼              ▼              ▼                  ▼
-          Excel          LinkedIn      Carousel        Whitepaper        Trend
-          dataset         posts          PDFs            PDFs            reports
+                                                       ┌────────────────────┤
+                                                       ▼                    ▼
+                                                   Excel                  Trend
+                                                  dataset                reports
 ```
 
-The engine pulls from 30 configured sources (tech press, first-party AI labs, expert newsletters, research blogs, Reddit, Hacker News), keeps only genuinely relevant items, ranks them by an importance score, and turns the top signals into publish-ready content.
+The engine pulls from 30 configured sources (tech press, first-party AI labs, expert newsletters, research blogs, Reddit, Hacker News), keeps only genuinely relevant items, ranks them by an importance score, and turns the top signals into publish-ready datasets.
 
 ---
 
@@ -27,9 +27,9 @@ The engine pulls from 30 configured sources (tech press, first-party AI labs, ex
 |--------|-------|
 | Sources configured | **30** (25 RSS + Hacker News + 3 Reddit + Product Hunt) |
 | RSS feeds live | **25 / 25** ✅ |
-| Raw articles collected | **297** |
+| Raw articles collected | **339** |
 | After dedupe + quality filter | **59** |
-| Runtime | **~22–45 s** |
+| Runtime | **~38 s** |
 | Score range | **30 – 128** |
 
 **Top stories from the latest run:**
@@ -40,7 +40,7 @@ The engine pulls from 30 configured sources (tech press, first-party AI labs, ex
 | 110 | Ahead of AI | Recent Developments in LLM Architectures: KV Sharing, mHC… |
 | 96 | NVIDIA Blog | NVIDIA Blackwell Leads on First Agentic AI Infrastructure Benchmark |
 | 95 | VentureBeat | PixelRAG beats text parsers on accuracy and cuts agent token costs 10x |
-| 87 | VentureBeat | Kimi K2.7-Code cuts thinking tokens 30% |
+| 87 | VentureBeat | How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA... |
 
 **Category balance:** Agentic AI 27 · Developer AI 14 · AI Update 14 · RAG/Infra 2 · Enterprise 2
 
@@ -61,7 +61,7 @@ python main.py --check-now
 
 **Primary outputs land in `outputs/`:**
 - `agentic_updates_<timestamp>.xlsx` — ranked dataset (sorted high → low score)
-- `linkedin_posts_<timestamp>.md` — ready-to-post LinkedIn content
+- `trend_report_<timestamp>.md` — markdown summary of top trends
 
 ---
 
@@ -71,8 +71,8 @@ python main.py --check-now
 | Collector | Source |
 |-----------|--------|
 | `rss_collector.py` | 25 RSS/Atom feeds — hardened with retry/backoff, multi-field summary & date extraction |
-| `hackernews_collector.py` | Hacker News Firebase API |
-| `reddit_collector.py` | Reddit JSON API (bot User-Agent + 429 backoff) |
+| `hackernews_collector.py` | Hacker News Firebase API (Limit expanded to 100 for broader net) |
+| `reddit_collector.py` | Reddit JSON API (bot User-Agent + 429 jitter + backoff) |
 | `api_collector.py` | Product Hunt GraphQL (optional, needs `PRODUCTHUNT_TOKEN`) |
 
 Sources are collected in parallel via a bounded thread pool, so one slow feed never blocks the run.
@@ -83,7 +83,7 @@ Sources are collected in parallel via a bounded thread pool, so one slow feed ne
 - **Category multipliers** tune emphasis per topic.
 - **Quality gates:** minimum score threshold + ≥2 distinct keywords + summary ≥ 60 chars.
 
-```
+```text
 final_score = (Σ keyword weights)  +  source weight  ×  category multiplier
 ```
 
@@ -96,24 +96,20 @@ final_score = (Σ keyword weights)  +  source weight  ×  category multiplier
 Canonical URL normalization + hybrid fuzzy title/summary matching (RapidFuzz). Keeps the strongest version of near-duplicate stories across sources.
 
 ### 5. Ranking
-The final dataset is **sorted by importance score (highest first)** before export — so the Excel file and LinkedIn output are delivered in ranked order.
+The final dataset is **sorted by importance score (highest first)** before export — so the Excel file is delivered in ranked order.
 
-### 6. Repackaging (`engines/`, `generators/`)
+### 6. Repackaging (`engines/`)
 | Tool | Output |
 |------|--------|
-| `refinement_engine.py` | Merges historical runs → refined master dataset + theme clusters |
-| `theme_clustering.py` | Collapses repeated narratives into named themes |
-| `generators/carousel_pdf_generator.py` | One theme-level LinkedIn carousel PDF per theme |
-| `engines/whitepaper_generator.py` | One consulting-style whitepaper PDF per theme |
-| `engines/linkedin_carousel_bw.py` | Black-and-white editorial carousel (10 slides) |
-| `engines/linkedin_carousel_canva.py` | Gray-minimal Canva-style carousel (9 slides) |
-| `engines/trend_analytics.py` | Markdown trend report |
+| `refinement_engine.py` | Merges historical runs → refined master dataset |
+| `trend_analytics.py` | Markdown trend report |
+| `historical_filter_engine.py` | Builds master datasets from historical runs |
 
 ---
 
 ## 📁 Project Structure
 
-```
+```text
 agentic-news-engine/
 ├── main.py                       # Pipeline orchestrator (parallel collect → rank → export)
 ├── requirements.txt
@@ -123,8 +119,7 @@ agentic-news-engine/
 ├── config/
 │   ├── portals.json              # 30 source definitions
 │   ├── keywords.json             # High-signal keywords
-│   ├── quality_modes.json        # strict / balanced / broad thresholds
-│   └── theme_clustering.json     # Clustering weights & theme patterns
+│   └── quality_modes.json        # strict / balanced / broad thresholds
 │
 ├── collectors/                   # Source collection layer
 │   ├── rss_collector.py
@@ -140,33 +135,18 @@ agentic-news-engine/
 │   ├── company_detector.py       # Company tagging (60+ companies)
 │   ├── insight_generator.py      # 3-perspective insights
 │   ├── deduplicator.py           # Fuzzy + URL dedupe
-│   ├── theme_clustering.py       # Narrative clustering + naming
 │   ├── excel_writer.py           # Excel export
-│   ├── linkedin_generator.py     # LinkedIn post text
-│   ├── top_updates.py            # Top-N ranking
-│   ├── pdf_theme.py              # Shared PDF palette
-│   └── text_layout.py            # PDF text-fit helpers
+│   └── top_updates.py            # Top-N ranking
 │
-├── engines/                      # Analysis & content repurposing
+├── engines/                      # Analysis & dataset merging
 │   ├── refinement_engine.py
 │   ├── trend_analytics.py
-│   ├── whitepaper_generator.py
-│   ├── carousel_generator.py
-│   ├── master_linkedin_generator.py
-│   ├── historical_filter_engine.py
-│   ├── linkedin_carousel_bw.py
-│   └── linkedin_carousel_canva.py
-│
-├── generators/
-│   └── carousel_pdf_generator.py # Canonical theme-level carousel generator
+│   └── historical_filter_engine.py
 │
 └── outputs/                      # All generated artifacts
     ├── agentic_updates_*.xlsx
     ├── refined_agentic_updates.xlsx
-    ├── linkedin_posts_*.md
-    ├── trend_report_*.md
-    ├── carousels/                # Theme carousel PDFs
-    └── whitepapers/              # Theme whitepaper PDFs
+    └── trend_report_*.md
 ```
 
 ---
@@ -202,14 +182,13 @@ agentic-news-engine/
 
 ## 🧩 Dependencies
 
-```
+```text
 feedparser       # RSS/Atom parsing
 requests         # HTTP
 beautifulsoup4   # HTML cleaning
 pandas           # Data handling
 openpyxl         # Excel export
-rapidfuzz        # Dedupe & clustering similarity
-reportlab        # Carousel & whitepaper PDF generation
+rapidfuzz        # Dedupe similarity
 ```
 
 ---
@@ -219,9 +198,9 @@ reportlab        # Carousel & whitepaper PDF generation
 - All source code compiles with no syntax errors.
 - All modules import cleanly.
 - All 25 RSS feeds return live data.
+- Reddit collector is stable and 429-proof with random jitter threading.
+- Hacker News fetches 60+ signals reliably per run.
 - Ranking is correct — output sorted by score (128 → 30), formula traced and verified.
-- All downstream engines run green: refinement, carousels, whitepapers, trend reports, LinkedIn.
-- Junk content (e.g. "House of the Dragon" trailer) correctly scores 0 and is rejected.
 
 ---
 
@@ -230,7 +209,6 @@ reportlab        # Carousel & whitepaper PDF generation
 - **Product Hunt** returns 0 without `PRODUCTHUNT_TOKEN` (cleanly skipped).
 - **Anthropic** has no working public RSS feed — omitted rather than adding a broken source.
 - A few research/strategy feeds (Hugging Face, Stratechery) may contribute 0 on days without agentic-AI content — expected, not a fault.
-- **Roadmap:** `config/carousel_themes.json` for centralized carousel palettes · daily scheduler · auto-draft (not auto-publish) to LinkedIn/Medium with a human review gate.
 
 See [CONTEXT.md](CONTEXT.md) for the full development log, bug-fix history, and design decisions.
 
