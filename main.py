@@ -98,7 +98,7 @@ def collect_articles(
 
         return (
             collect_hackernews(
-                limit=20
+                limit=100
             )
         )
 

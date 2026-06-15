@@ -1,5 +1,7 @@
 import html
+import random
 import re
+import time
 
 import feedparser
 import requests
@@ -39,30 +41,6 @@ def clean_summary(text):
     return clean[:500]
 
 
-def clean_summary(text):
-
-    if not text:
-        return ""
-
-    text = html.unescape(text)
-
-    soup = BeautifulSoup(
-        text,
-        "html.parser"
-    )
-
-    clean = soup.get_text(
-        " ",
-        strip=True
-    )
-
-    clean = re.sub(
-        r"\s+",
-        " ",
-        clean
-    ).strip()
-
-    return clean[:500]
 
 
 def collect_reddit(
@@ -70,6 +48,9 @@ def collect_reddit(
     limit=10,
     timeout=6
 ):
+
+    # Add random jitter to prevent concurrent threads from hitting Reddit simultaneously
+    time.sleep(random.uniform(0.5, 3.0))
 
     articles = []
 
@@ -89,8 +70,7 @@ def collect_reddit(
                     timeout=timeout
                 )
                 if response.status_code == 429:
-                    import time
-                    time.sleep(3)
+                    time.sleep(3 * (attempt + 1))  # Progressive backoff
                     continue
                 break
 
