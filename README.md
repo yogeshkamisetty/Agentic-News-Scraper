@@ -1,4 +1,4 @@
-# 🧠 Agentic News Engine
+# Agentic News Engine
 
 An automated AI market-intelligence pipeline that **collects, filters, scores, deduplicates, and repackages** high-signal AI news into decision-ready outputs — Excel datasets and trend reports.
 
@@ -6,7 +6,7 @@ An automated AI market-intelligence pipeline that **collects, filters, scores, d
 
 ---
 
-## ✨ What It Does
+## What It Does
 
 ```text
 30 sources  →  collect  →  dedupe  →  score & filter  →  enrich  →  rank  →  outputs
@@ -21,12 +21,12 @@ The engine pulls from 30 configured sources (tech press, first-party AI labs, ex
 
 ---
 
-## 📊 Latest Run Results (June 15, 2026)
+## Latest Run Results (June 15, 2026)
 
 | Metric | Value |
 |--------|-------|
 | Sources configured | **30** (25 RSS + Hacker News + 3 Reddit + Product Hunt) |
-| RSS feeds live | **25 / 25** ✅ |
+| RSS feeds live | **25 / 25** |
 | Raw articles collected | **339** |
 | After dedupe + quality filter | **59** |
 | Runtime | **~38 s** |
@@ -46,7 +46,7 @@ The engine pulls from 30 configured sources (tech press, first-party AI labs, ex
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # 1. Install dependencies
@@ -65,7 +65,7 @@ python main.py --check-now
 
 ---
 
-## 🔧 How It Works
+## How It Works
 
 ### 1. Collection (`collectors/`)
 | Collector | Source |
@@ -107,7 +107,7 @@ The final dataset is **sorted by importance score (highest first)** before expor
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 agentic-news-engine/
@@ -151,7 +151,7 @@ agentic-news-engine/
 
 ---
 
-## 📡 Sources (30)
+## Sources (30)
 
 **First-party AI labs:** OpenAI · Google DeepMind · Google AI Blog · Hugging Face · NVIDIA Blog
 **Tech press:** TechCrunch · VentureBeat · MIT Technology Review · The Verge · Wired · Ars Technica · The Decoder · MarkTechPost
@@ -165,7 +165,7 @@ agentic-news-engine/
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 | To change… | Edit… |
 |------------|-------|
@@ -180,7 +180,7 @@ agentic-news-engine/
 
 ---
 
-## 🧩 Dependencies
+## Dependencies
 
 ```text
 feedparser       # RSS/Atom parsing
@@ -193,7 +193,7 @@ rapidfuzz        # Dedupe similarity
 
 ---
 
-## ✅ Verified Health (June 15, 2026)
+## Verified Health (June 15, 2026)
 
 - All source code compiles with no syntax errors.
 - All modules import cleanly.
@@ -204,7 +204,7 @@ rapidfuzz        # Dedupe similarity
 
 ---
 
-## 📌 Known Notes & Roadmap
+## Known Notes & Roadmap
 
 - **Product Hunt** returns 0 without `PRODUCTHUNT_TOKEN` (cleanly skipped).
 - **Anthropic** has no working public RSS feed — omitted rather than adding a broken source.
