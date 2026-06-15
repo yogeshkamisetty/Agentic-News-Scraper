@@ -2,6 +2,18 @@
 
 **Current snapshot:** June 15, 2026
 
+## June 15, 2026 (Part 3) — Project Cleanup & Reddit Rate Limit Fix
+
+### What We Did
+- Cleaned up the repository by removing obsolete documentation (`CODE_CHANGES_2026-05-31.md`, `FIXES_SUMMARY_2026-05-31.md`, `TROUBLESHOOTING.md`), and empty folders (`.claude/`, `samples/`).
+- Updated the git remote repository to track: `https://github.com/yogeshkamisetty/Agentic-News-Scraper.git`.
+
+### Issues Faced & Resolved
+- **Reddit Rate Limits (429 Too Many Requests):** The engine was consistently failing to collect from Reddit (especially `r/singularity`) because Reddit rate limits anonymous and rapid API requests.
+- **Resolution:** Modified `collectors/reddit_collector.py` to use a custom Python bot `User-Agent` (`python:agentic_news_engine:v1.0`). We also introduced a backoff retry loop: if the engine encounters a `429` status code, it sleeps for 3 seconds and retries up to 3 times before failing. This resolved the issue and allowed Reddit to successfully return updates.
+
+---
+
 ## June 15, 2026 (Part 2) — Source Audit & Scrape Engine Hardening
 
 Tested every configured source for liveness, pruned dead feeds, added verified
@@ -451,7 +463,6 @@ agentic-news-engine/
 ├── README.txt                       # Basic setup instructions
 ├── requirements.txt                 # Python dependencies
 ├── CONTEXT.md                       # This file - Project documentation
-├── TROUBLESHOOTING.md               # Current issues and solutions guide
 ├── engines/                         # Trend analysis and content repurposing tools
 │   ├── carousel_generator.py        # Builds carousel JSON from master data
 │   ├── carousel_pdf_generator.py    # ⚠️ Per-article 6-slide prototype (see note)
@@ -723,7 +734,7 @@ outputs/trend_report_*.md
 5. **Limited Deduplication**: May miss subtle duplicates
 6. **Config / pipeline mismatch**: Some sources can be listed in config before their collector is wired into `main.py`
 7. **RSS-dependent for many sources**: No general web scraping layer yet
-8. **Reddit API Blocked**: 403 Forbidden errors require OAuth implementation (see [TROUBLESHOOTING.md](TROUBLESHOOTING.md))
+8. **Reddit API Blocked**: 403/429 errors mitigated via custom User-Agents and retry loops, but true reliability requires OAuth implementation.
 9. **Hacker News Low Results**: Keyword filtering too strict, producing 0 results in many runs
 10. **Intermittent Feed Failures**: 5 RSS feeds consistently returning 0 results
 11. **Editorial Polishing Still Ongoing**: The content layer is now stronger, but theme-specific copy can still be tightened further when new topics appear
@@ -732,13 +743,12 @@ outputs/trend_report_*.md
 
 ## Troubleshooting & Known Issues
 
-For detailed information on current issues and solutions, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md):
+*(Note: The old TROUBLESHOOTING.md has been deleted; issues are now tracked here).*
 
-- **Reddit 403 Blocking**: Multiple solutions with implementation guides
-- **Hacker News Low Collection**: Analysis and fix recommendations
-- **Empty RSS Feeds**: Diagnostic steps and validation procedures
-- **Product Hunt Integration**: Implementation guide
-- **Performance Metrics**: Current status and optimization opportunities
+- **Reddit Rate Limiting**: Largely mitigated via retry loops and custom User-Agent in the collector.
+- **Hacker News Low Collection**: Timeouts have been increased to allow more comprehensive fetching.
+- **Product Hunt Integration**: Currently returns 0 updates until `PRODUCTHUNT_TOKEN` is configured.
+- **Performance Metrics**: Added source-specific execution times to the console output to track slow endpoints.
 
 ---
 
