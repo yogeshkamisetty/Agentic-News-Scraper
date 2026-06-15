@@ -6,18 +6,37 @@ import requests
 from bs4 import BeautifulSoup
 
 
-USER_AGENT = (
-    "Mozilla/5.0 "
-    "(Windows NT 10.0; Win64; x64) "
-    "AppleWebKit/537.36 "
-    "(KHTML, like Gecko) "
-    "Chrome/120.0.0.0 Safari/537.36"
-)
+USER_AGENT = "python:agentic_news_engine:v1.0"
 
 REDDIT_HEADERS = {
     "User-Agent": USER_AGENT,
     "Accept": "application/rss+xml, application/xml, text/xml, */*",
 }
+
+def clean_summary(text):
+
+    if not text:
+        return ""
+
+    text = html.unescape(text)
+
+    soup = BeautifulSoup(
+        text,
+        "html.parser"
+    )
+
+    clean = soup.get_text(
+        " ",
+        strip=True
+    )
+
+    clean = re.sub(
+        r"\s+",
+        " ",
+        clean
+    ).strip()
+
+    return clean[:500]
 
 
 def clean_summary(text):
@@ -62,12 +81,18 @@ def collect_reddit(
     for feed_url in feed_urls:
 
         try:
-
-            response = requests.get(
-                feed_url,
-                headers=REDDIT_HEADERS,
-                timeout=timeout
-            )
+            response = None
+            for attempt in range(3):
+                response = requests.get(
+                    feed_url,
+                    headers=REDDIT_HEADERS,
+                    timeout=timeout
+                )
+                if response.status_code == 429:
+                    import time
+                    time.sleep(3)
+                    continue
+                break
 
             response.raise_for_status()
 
