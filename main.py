@@ -520,7 +520,13 @@ def main():
         )
     )
 
-    filtered_articles = clean_articles
+    # Rank the final dataset by importance score (highest first) so the
+    # saved Excel and LinkedIn outputs are delivered in ranked order.
+    filtered_articles = sorted(
+        clean_articles,
+        key=lambda a: a.get("Importance Score", 0),
+        reverse=True
+    )
 
     output_file = (
         save_to_excel(

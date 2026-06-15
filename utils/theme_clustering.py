@@ -304,6 +304,12 @@ def build_theme_name(articles, fallback_category="AI Update"):
         if keywords and any(keyword in lowered for keyword in keywords):
             return pattern.get("name", fallback_category)
 
+    # Singleton clusters carry too little signal for reliable token-based
+    # naming (it produces junk like "Last Have" or "Queen Regulating").
+    # When a lone article matches no priority rule, use its category.
+    if len(articles) < 2:
+        return fallback_category
+
     token_counts = Counter()
     for article in articles:
         token_counts.update(tokenize(article.get("Title", "")))
