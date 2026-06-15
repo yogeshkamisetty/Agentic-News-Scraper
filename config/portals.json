@@ -30,24 +30,51 @@
     "url": "http://feeds.arstechnica.com/arstechnica/index"
   },
   {
+    "name": "The Decoder",
+    "method": "rss",
+    "url": "https://the-decoder.com/feed/"
+  },
+  {
+    "name": "MarkTechPost",
+    "method": "rss",
+    "url": "https://www.marktechpost.com/feed/"
+  },
+
+  {
+    "name": "OpenAI",
+    "method": "rss",
+    "url": "https://openai.com/news/rss.xml"
+  },
+  {
+    "name": "Google DeepMind",
+    "method": "rss",
+    "url": "https://deepmind.google/blog/rss.xml"
+  },
+  {
+    "name": "Google AI Blog",
+    "method": "rss",
+    "url": "https://blog.google/technology/ai/rss/"
+  },
+  {
+    "name": "Hugging Face",
+    "method": "rss",
+    "url": "https://huggingface.co/blog/feed.xml"
+  },
+  {
+    "name": "NVIDIA Blog",
+    "method": "rss",
+    "url": "https://blogs.nvidia.com/feed/"
+  },
+
+  {
     "name": "Import AI",
     "method": "rss",
     "url": "https://importai.substack.com/feed"
   },
   {
-    "name": "The Batch",
-    "method": "rss",
-    "url": "https://www.deeplearning.ai/the-batch/feed/"
-  },
-  {
     "name": "Ahead of AI",
     "method": "rss",
     "url": "https://magazine.sebastianraschka.com/feed"
-  },
-  {
-    "name": "AI Breakfast",
-    "method": "rss",
-    "url": "https://aibreakfast.beehiiv.com/feed"
   },
   {
     "name": "Ben's Bites",
@@ -60,9 +87,36 @@
     "url": "https://www.latent.space/feed"
   },
   {
+    "name": "TLDR AI",
+    "method": "rss",
+    "url": "https://tldr.tech/api/rss/ai"
+  },
+  {
+    "name": "Simon Willison",
+    "method": "rss",
+    "url": "https://simonwillison.net/atom/everything/"
+  },
+  {
+    "name": "Stratechery",
+    "method": "rss",
+    "url": "https://stratechery.com/feed/"
+  },
+
+  {
+    "name": "BAIR Berkeley",
+    "method": "rss",
+    "url": "https://bair.berkeley.edu/blog/feed.xml"
+  },
+  {
+    "name": "MIT News AI",
+    "method": "rss",
+    "url": "https://news.mit.edu/topic/mitartificial-intelligence2-rss.xml"
+  },
+
+  {
     "name": "a16z",
     "method": "rss",
-    "url": "https://a16z.com/feed/"
+    "url": "https://a16z.news/feed"
   },
   {
     "name": "Y Combinator",

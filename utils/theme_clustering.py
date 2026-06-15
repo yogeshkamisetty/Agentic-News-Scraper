@@ -45,7 +45,23 @@ TRACKING_PARAMS = {
 THEME_GENERIC_TOKENS = {
     "ai", "model", "models", "system", "systems", "update", "updates",
     "launch", "launches", "announces", "announced", "news", "report",
-    "reports", "new", "next", "platform", "platforms", "tool", "tools"
+    "reports", "new", "next", "platform", "platforms", "tool", "tools",
+    # newsletter / publication names that leak into theme titles
+    "import", "download", "batch", "breakfast", "bites", "latent",
+    "space", "ahead", "weekly", "daily", "edition", "issue", "roundup",
+    "digest", "newsletter", "podcast", "interview", "recap",
+    # weak descriptors
+    "guide", "intro", "overview", "deep", "dive", "part", "way", "ways",
+    "thing", "things", "story", "today", "week", "year",
+}
+
+# Vendor / proper-noun fragments that make poor standalone theme names.
+# When a fallback name would be built ONLY from these, we prefer the
+# representative article's Category instead (e.g. "Google 2026" -> "AI Update").
+THEME_VENDOR_TOKENS = {
+    "google", "openai", "anthropic", "meta", "microsoft", "nvidia",
+    "amazon", "apple", "alibaba", "deepseek", "mistral", "qwen",
+    "gemini", "claude", "gpt", "llama", "apex", "minimax", "cohere",
 }
 
 THEME_PRIORITY_RULES = [
@@ -293,8 +309,14 @@ def build_theme_name(articles, fallback_category="AI Update"):
         token_counts.update(tokenize(article.get("Title", "")))
         token_counts.update(tokenize(article.get("Summary", "")))
 
+    # Drop generic tokens, pure-numeric tokens, tokens containing digits
+    # (e.g. "qwen3", "440", "2026"), and very short fragments.
     for token in list(token_counts.keys()):
-        if token in THEME_GENERIC_TOKENS:
+        if (
+            token in THEME_GENERIC_TOKENS
+            or any(ch.isdigit() for ch in token)
+            or len(token) < 4
+        ):
             token_counts.pop(token, None)
 
     top_tokens = [token for token, _ in token_counts.most_common(3)]
@@ -302,13 +324,33 @@ def build_theme_name(articles, fallback_category="AI Update"):
     if not top_tokens:
         return fallback_category
 
-    if len(top_tokens) == 1:
-        return top_tokens[0].replace("-", " ").title()
+    # Use at most the top 2 tokens for the name.
+    name_tokens = top_tokens[:2]
 
-    if len(top_tokens) >= 2:
-        return f"{top_tokens[0].replace('-', ' ').title()} {top_tokens[1].replace('-', ' ').title()}"
+    # If the tokens that would form the name are ALL vendor/proper-noun
+    # fragments (e.g. "Google Gemini", "Apex Claude"), the result reads as
+    # noise rather than a theme — prefer the representative's category.
+    if all(token in THEME_VENDOR_TOKENS for token in name_tokens):
+        return fallback_category
 
-    return fallback_category
+    return " ".join(_pretty_token(token) for token in name_tokens)
+
+
+# Acronyms that should keep canonical casing in theme names.
+_THEME_ACRONYMS = {
+    "llm": "LLM", "llms": "LLMs", "rag": "RAG", "api": "API",
+    "apis": "APIs", "mcp": "MCP", "sdk": "SDK", "gpu": "GPU",
+    "ai": "AI", "ml": "ML", "saas": "SaaS",
+}
+
+
+def _pretty_token(token):
+    """Title-case a token, preserving known acronym casing."""
+    cleaned = token.replace("-", " ")
+    parts = []
+    for word in cleaned.split():
+        parts.append(_THEME_ACRONYMS.get(word.lower(), word.title()))
+    return " ".join(parts)
 
 
 def infer_theme_key(article):

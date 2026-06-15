@@ -1,6 +1,111 @@
 # Agentic News Engine - Project Context
 
-**Current snapshot:** June 6, 2026
+**Current snapshot:** June 15, 2026
+
+## June 15, 2026 (Part 2) — Source Audit & Scrape Engine Hardening
+
+Tested every configured source for liveness, pruned dead feeds, added verified
+new sources, and hardened the RSS collector.
+
+### Dead feeds removed
+- **The Batch** (`deeplearning.ai/the-batch/feed/`) — 404, all alternate URLs
+  (ghost, substack, raw) also failed. Removed.
+- **AI Breakfast** (`aibreakfast.beehiiv.com/feed`) — 404, feed discontinued. Removed.
+
+### Feed fixed
+- **a16z** — old `a16z.com/feed/` was 404. Switched to the Substack feed
+  `https://a16z.news/feed` (verified, 20 fresh entries).
+
+### New verified sources added (12)
+First-party AI labs: **OpenAI** (`openai.com/news/rss.xml`), **Google DeepMind**
+(`deepmind.google/blog/rss.xml`), **Google AI Blog**, **Hugging Face**, **NVIDIA Blog**.
+Press: **The Decoder**, **MarkTechPost**. Expert commentary: **Simon Willison**,
+**TLDR AI**, **Stratechery**. Research: **BAIR Berkeley**, **MIT News AI**.
+All tested live (HTTP 200, fresh entries) before adding.
+
+> Couldn't find a working Anthropic RSS feed (all known URLs 404); skipped rather
+> than add a broken source. Microsoft AI blog returned 410 Gone; skipped.
+
+### Source weights updated
+`utils/source_ranker.py` — added credibility weights for all new sources
+(OpenAI/DeepMind +22 as first-party; The Decoder/MarkTechPost mid-press;
+Simon Willison/Stratechery expert tier; BAIR/MIT News research tier).
+
+### Scrape engine hardened (`collectors/rss_collector.py`)
+- Retry with backoff (2 retries) on timeouts, 429, and 5xx.
+- Timeout raised 8s → 15s (configurable).
+- **Multi-field summary extraction**: summary → content[].value → description →
+  subtitle, picking the richest body (fixes thin-summary sources).
+- Multi-field date extraction (published → updated → pubDate → created).
+- Never raises — always returns a list; consistent article schema.
+
+### Result (full run, June 15)
+- Portals: 20 → **30** configured.
+- Raw collected: 177 → **296**. Quality articles: 24 → **59**. Runtime ~21s.
+- 28 of 59 quality articles come from newly-added sources.
+- Category balance healthy: Agentic 27 / Developer 14 / AI Update 14 / RAG 2 / Enterprise 2.
+
+---
+
+## June 15, 2026 — Data Quality, Theme Naming & Content Repurposing
+
+This session focused on three things: hardening the scoring/filter so noise
+stops reaching the dataset, cleaning up theme names that leaked into output
+titles, and building the LinkedIn carousel layer.
+
+### Bugs found and fixed (data pipeline)
+1. **Substring keyword false positives** — `utils/scorer.py` used `keyword in text`,
+   so `"rag"` matched `"d**rag**on"` and a "House of the Dragon" trailer scored 32
+   and entered the dataset. **Fix:** word-boundary regex matching (`\brag`). Also
+   added negative keywords (`trailer`, `romance`, `lithium`, `season`, etc.).
+2. **Tier-1 source threshold too low (25)** — Wired/TechCrunch/VentureBeat passed on
+   source bonus alone. **Fix:** raised tier1 `25→40`, newsletters `30→45` in
+   `config/quality_modes.json` default + `utils/quality_mode.py` fallback.
+3. **`Developer AI` category never used** — classifier checked Agentic AI first and
+   absorbed all coding articles. **Fix:** reordered `utils/category_classifier.py`
+   so Developer AI / RAG / Enterprise are tested before the broad Agentic bucket,
+   all with word-boundary matching.
+4. **Thin newsletter summaries passing** — Import AI / Latent Space return 20–90 char
+   teasers. **Fix:** `main.py` rejects `summary < 60 chars`.
+5. **Single keyword could solo-pass an article** — **Fix:** `main.py` requires
+   ≥2 distinct keyword hits.
+6. **Empty Excel files saved** — runs with 0 results still wrote a file.
+   **Fix:** `utils/excel_writer.py` returns `None` and skips writing when empty;
+   `main.py` prints a warning instead.
+7. **Company detector too small (14 names)** — 15/22 rows had blank "Company".
+   **Fix:** `utils/company_detector.py` expanded to 60+ companies (Mistral,
+   Alibaba, Mind Lab, Datacurve, DeepSeek, Cursor, Neo4j, etc.).
+8. **Noisy theme names** ("Apex Qwen3", "Import 440", "Google 2026", "Reasoning Llms")
+   leaked into whitepaper/carousel titles. **Fix:** `utils/theme_clustering.py` —
+   drop digit-bearing tokens, newsletter names, and short fragments; fall back to the
+   representative's Category when only vendor/proper-noun fragments remain; added
+   acronym casing (LLM/RAG/API/MCP/SaaS). Result: clean theme names.
+
+### Content repurposing layer built
+- `engines/linkedin_carousel_bw.py` — premium black-and-white editorial carousel
+  (10 slides, 600×600pt, Apple/Notion style). Standalone, zero API.
+- `engines/linkedin_carousel_canva.py` — "Gray Minimal" Canva-style carousel
+  (9 slides, 540×675pt 4:5, oval number badges, pill buttons, logo). Standalone.
+- `engines/carousel_pdf_generator.py` — per-article 6-slide dark-theme prototype.
+  **NOTE:** this is distinct from `generators/carousel_pdf_generator.py` (the
+  theme-level generator wired into the documented workflow). Same filename, two
+  folders, different purpose — see "Known maintainability notes" below.
+
+### Decisions recorded (publishing strategy)
+- **LinkedIn carousels** are uploaded as a PDF Document post (one PDF per article).
+- **Medium auto-publishing was considered and rejected** in favor of an
+  **auto-draft + manual-publish** flow: republishing scraped summaries verbatim
+  risks copyright + Medium ToS + duplicate-content penalties, and unattended
+  publishing has no safety gate. The engine should draft; a human hits publish.
+
+### Verification (June 15)
+- `python -m compileall` on all source: no syntax errors.
+- All 27 modules import cleanly.
+- All downstream engines run green: refinement, theme carousel, whitepaper,
+  trend analytics, master LinkedIn, carousel JSON, BW carousel, Canva carousel.
+- `python -B main.py --check-now` passes (quality mode balanced, 20 portals).
+
+---
 
 ## June 6, 2026 Maintenance Update
 
@@ -349,12 +454,17 @@ agentic-news-engine/
 ├── TROUBLESHOOTING.md               # Current issues and solutions guide
 ├── engines/                         # Trend analysis and content repurposing tools
 │   ├── carousel_generator.py        # Builds carousel JSON from master data
-│   ├── carousel_pdf_generator.py    # Generates theme-level LinkedIn carousel PDFs
+│   ├── carousel_pdf_generator.py    # ⚠️ Per-article 6-slide prototype (see note)
+│   ├── linkedin_carousel_bw.py      # B&W editorial carousel (10 slides, 600×600)
+│   ├── linkedin_carousel_canva.py   # Gray-minimal Canva-style carousel (9 slides, 4:5)
 │   ├── historical_filter_engine.py  # Builds master datasets from historical runs
 │   ├── master_linkedin_generator.py # Generates LinkedIn content from master data
 │   ├── refinement_engine.py         # Builds refined datasets and theme summaries
 │   ├── trend_analytics.py           # Creates trend report markdown
 │   └── whitepaper_generator.py      # Generates theme-level consulting whitepaper PDFs
+│
+├── generators/                      # Document rendering layer
+│   └── carousel_pdf_generator.py    # Theme-level LinkedIn carousel PDFs (canonical)
 │
 ├── collectors/                      # Article collection modules
 │   ├── __init__.py
@@ -386,15 +496,45 @@ agentic-news-engine/
 │
 └── outputs/                         # Generated output directory
     ├── agentic_updates.xlsx        # Latest Excel output
+    ├── refined_agentic_updates.xlsx # Canonical refined dataset (overwritten each run)
     ├── master_agentic_updates_*.xlsx
+    ├── refined_agentic_updates_*.xlsx
+    ├── theme_clusters_*.json
     ├── master_linkedin_posts_*.md
     ├── linkedin_posts_*.md
     ├── trend_report_*.md
     ├── carousel_data_*.json
     ├── carousels/                  # Theme-level LinkedIn carousel PDFs
-    ├── whitepapers/                # Theme-level consulting whitepaper PDFs
+    ├── carousel_bw/                # B&W editorial carousel PDFs
+    ├── carousel_canva/             # Gray-minimal Canva-style carousel PDFs
+    ├── whitepapers/               # Theme-level consulting whitepaper PDFs
     └── other timestamped artifacts
 ```
+
+---
+
+## Known Maintainability Notes
+
+1. **Duplicate filename `carousel_pdf_generator.py`** exists in two folders:
+   - `generators/carousel_pdf_generator.py` — **canonical**, theme-level, reads
+     `outputs/refined_agentic_updates.xlsx`, writes `outputs/carousels/`. This is
+     the one the documented workflow uses.
+   - `engines/carousel_pdf_generator.py` — earlier per-article prototype, reads the
+     master dataset, writes `outputs/carousel/` (singular). Kept for reference but
+     superseded by the style-specific generators (`linkedin_carousel_bw.py`,
+     `linkedin_carousel_canva.py`). Neither file is imported by other modules, so
+     they don't collide — but the shared name is confusing. Consider renaming the
+     engines/ prototype (e.g. `carousel_per_article_prototype.py`) or removing it.
+
+2. **Input-file freshness**: `refinement_engine.py` overwrites the static
+   `outputs/refined_agentic_updates.xlsx` on every run AND writes a timestamped
+   copy. Downstream generators read the static file first, so they always get the
+   freshest refined data. Do not delete the static file or downstream tools fall
+   back to the newest timestamped/master file.
+
+3. **Carousel themes/colors**: a proposed `config/carousel_themes.json` (single
+   source of truth for palettes) is the recommended next step so all carousel
+   templates read colors from one place rather than hardcoding hex values.
 
 ---
 
@@ -640,6 +780,6 @@ For detailed information on current issues and solutions, see [TROUBLESHOOTING.m
 
 ---
 
-**Last Updated**: May 31, 2026  
+**Last Updated**: June 15, 2026  
 **Project Status**: Active Development  
 **Maintained By**: Agentic News Engine Team
